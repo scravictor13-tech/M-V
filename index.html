@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roblox GUI Builder</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+
+    <header class="topbar">
+      <div class="logo">Roblox GUI Builder</div>
+      <div class="topbar-actions">
+        <button id="btnFrame">+ Frame</button>
+        <button id="btnTextLabel">+ TextLabel</button>
+        <button id="btnTextButton">+ TextButton</button>
+        <div class="topbar-sep"></div>
+        <button id="btnUndo" title="Ctrl+Z">↩ Undo</button>
+        <button id="btnRedo" title="Ctrl+Y">↪ Redo</button>
+        <button id="btnDuplicate" title="Ctrl+D">⧉ Dupliquer</button>
+        <div class="topbar-sep"></div>
+        <button id="btnSave">💾 Sauvegarder</button>
+        <button id="btnLoad">📂 Charger</button>
+        <button id="btnExport">🚀 Export Lua</button>
+        <button id="btnExportPng">🖼️ Export PNG</button>
+      </div>
+    </header>
+
+    <div class="workspace">
+
+      <aside class="sidebar left"></aside>
+
+      <main class="editor">
+        <!-- Toolbar sous le canvas -->
+        <div class="canvas-toolbar">
+          <div class="zoom-controls">
+            <button id="btnZoomOut">−</button>
+            <span id="zoomDisplay">100%</span>
+            <button id="btnZoomIn">+</button>
+            <button id="btnZoomReset">1:1</button>
+          </div>
+          <div class="res-controls">
+            <span id="resLabel">600 × 500</span>
+            <select id="resolutionSelect">
+              <option value="">Résolution</option>
+              <option value="480p">480p — 854×480</option>
+              <option value="720p">720p — 1280×720</option>
+              <option value="1080p">1080p — 1920×1080</option>
+              <option value="custom">Custom…</option>
+            </select>
+            <div id="customResWrap" style="display:none">
+              <input id="customW" type="number" placeholder="W" value="800" />
+              <span>×</span>
+              <input id="customH" type="number" placeholder="H" value="600" />
+              <button id="btnApplyRes">OK</button>
+            </div>
+          </div>
+          <div class="shortcuts-hint">
+            <span>Ctrl+Z Undo</span>
+            <span>Ctrl+D Dupliquer</span>
+            <span>Suppr Supprimer</span>
+            <span>Ctrl+Molette Zoom</span>
+          </div>
+        </div>
+        <div class="canvas-wrapper">
+          <div id="canvas" class="canvas"></div>
+        </div>
+      </main>
+
+      <aside class="sidebar right" id="propsPanel">
+        <h3>Propriétés</h3>
+        <div id="noSelection" class="no-selection">Sélectionne un élément</div>
+        <div id="propsContent" style="display:none">
+
+          <div class="prop-section">
+            <div class="prop-section-title">📐 Layout</div>
+            <div class="prop-row"><div class="prop-field"><label>Nom</label><input id="propName" type="text" /></div></div>
+            <div class="prop-row two">
+              <div class="prop-field"><label>X (px)</label><input id="propX" type="number" /></div>
+              <div class="prop-field"><label>Y (px)</label><input id="propY" type="number" /></div>
+            </div>
+            <div class="prop-row two">
+              <div class="prop-field"><label>Largeur</label><input id="propWidth" type="number" /></div>
+              <div class="prop-field"><label>Hauteur</label><input id="propHeight" type="number" /></div>
+            </div>
+          </div>
+
+          <div class="prop-section">
+            <div class="prop-section-title">🎨 Apparence</div>
+            <div class="prop-row two">
+              <div class="prop-field"><label>Couleur fond</label><input id="propColor" type="color" /></div>
+              <div class="prop-field">
+                <label>Transparence : <span id="propTransparencyVal">0</span></label>
+                <input id="propTransparency" type="range" min="0" max="1" step="0.01" />
+              </div>
+            </div>
+            <div class="prop-row">
+              <div class="prop-field toggle-row">
+                <label>✨ Blur (verre dépoli)</label>
+                <input id="propBlurEnabled" type="checkbox" />
+              </div>
+            </div>
+            <div class="prop-row">
+              <div class="prop-field">
+                <label>Intensité blur : <span id="propBlurAmountVal">10</span>px</label>
+                <input id="propBlurAmount" type="range" min="1" max="40" step="1" value="10" />
+              </div>
+            </div>
+          </div>
+
+          <div class="prop-section" id="sectionText">
+            <div class="prop-section-title">✏️ Texte</div>
+            <div class="prop-row"><div class="prop-field"><label>Contenu</label><input id="propText" type="text" /></div></div>
+            <div class="prop-row two">
+              <div class="prop-field"><label>Couleur texte</label><input id="propTextColor" type="color" value="#ffffff" /></div>
+              <div class="prop-field"><label>Taille</label><input id="propFontSize" type="number" min="6" max="100" /></div>
+            </div>
+            <div class="prop-row">
+              <div class="prop-field">
+                <label>Police</label>
+                <select id="propFont">
+                  <option value="GothamBold">GothamBold</option>
+                  <option value="Gotham">Gotham</option>
+                  <option value="Arial">Arial</option>
+                  <option value="ArialBold">ArialBold</option>
+                  <option value="SourceSansPro">SourceSansPro</option>
+                  <option value="RobotoMono">RobotoMono</option>
+                  <option value="Ubuntu">Ubuntu</option>
+                  <option value="Code">Code</option>
+                  <option value="Cartoon">Cartoon</option>
+                  <option value="Arcade">Arcade</option>
+                </select>
+              </div>
+            </div>
+            <div class="prop-row">
+              <div class="prop-field"><label>Alignement H</label>
+                <div class="btn-group" id="propTextXAlign">
+                  <button data-val="Left">◀</button>
+                  <button data-val="Center">■</button>
+                  <button data-val="Right">▶</button>
+                </div>
+              </div>
+            </div>
+            <div class="prop-row">
+              <div class="prop-field"><label>Alignement V</label>
+                <div class="btn-group" id="propTextYAlign">
+                  <button data-val="Top">▲</button>
+                  <button data-val="Center">■</button>
+                  <button data-val="Bottom">▼</button>
+                </div>
+              </div>
+            </div>
+            <div class="prop-row"><div class="prop-field toggle-row"><label>Texte tronqué</label><input id="propTextTruncate" type="checkbox" /></div></div>
+          </div>
+
+          <!-- GRADIENT -->
+          <div class="prop-section">
+            <div class="prop-section-title">🌈 Dégradé (UIGradient)</div>
+            <div class="prop-row"><div class="prop-field toggle-row"><label>Activer</label><input id="propGradientEnabled" type="checkbox" /></div></div>
+            <div class="prop-row">
+              <div class="prop-field">
+                <label>Type</label>
+                <div class="btn-group" id="propGradientType">
+                  <button data-val="linear">Linéaire</button>
+                  <button data-val="radial">Radial</button>
+                </div>
+              </div>
+            </div>
+            <div class="prop-row two">
+              <div class="prop-field"><label>Couleur 1</label><input id="propGradientColor1" type="color" value="#3a7bd5" /></div>
+              <div class="prop-field"><label>Couleur 2</label><input id="propGradientColor2" type="color" value="#e74c3c" /></div>
+            </div>
+            <div class="prop-row">
+              <div class="prop-field">
+                <label>Angle (linéaire) : <span id="propGradientAngleVal">90</span>°</label>
+                <input id="propGradientAngle" type="range" min="0" max="360" step="1" value="90" />
+              </div>
+            </div>
+            <div class="prop-row two">
+              <div class="prop-field">
+                <label>Stop 1 : <span id="propGradientStop1Val">0</span></label>
+                <input id="propGradientStop1" type="range" min="0" max="1" step="0.01" value="0" />
+              </div>
+              <div class="prop-field">
+                <label>Stop 2 : <span id="propGradientStop2Val">1</span></label>
+                <input id="propGradientStop2" type="range" min="0" max="1" step="0.01" value="1" />
+              </div>
+            </div>
+            <div class="prop-row" id="gradientPreview">
+              <div class="gradient-preview-bar" id="gradPreviewBar"></div>
+            </div>
+          </div>
+
+          <!-- TEXTURE -->
+          <div class="prop-section">
+            <div class="prop-section-title">🧱 Texture</div>
+            <div class="prop-row"><div class="prop-field toggle-row"><label>Activer</label><input id="propTextureEnabled" type="checkbox" /></div></div>
+            <div class="prop-row">
+              <div class="prop-field">
+                <label class="texture-label-row">
+                  Texture
+                  <button id="btnReloadTextures" title="Recharger le dossier textures/">🔄</button>
+                </label>
+                <select id="propTexturePreset">
+                  <option value="">— Aucune texture —</option>
+                </select>
+                <div class="texture-hint">📂 Mets tes images dans le dossier <strong>textures/</strong></div>
+              </div>
+            </div>
+            <div class="prop-row two">
+              <div class="prop-field">
+                <label>Opacité : <span id="propTextureOpacityVal">0.3</span></label>
+                <input id="propTextureOpacity" type="range" min="0" max="1" step="0.01" value="0.3" />
+              </div>
+              <div class="prop-field">
+                <label>Taille tuile (px)</label>
+                <input id="propTextureTileSize" type="number" min="8" max="512" value="64" />
+              </div>
+            </div>
+            <div class="prop-row">
+              <div class="prop-field">
+                <label>Blend mode</label>
+                <select id="propTextureBlendMode">
+                  <option value="normal">Normal</option>
+                  <option value="overlay">Overlay</option>
+                  <option value="multiply">Multiply</option>
+                  <option value="screen">Screen</option>
+                  <option value="soft-light">Soft Light</option>
+                  <option value="hard-light">Hard Light</option>
+                  <option value="color-dodge">Color Dodge</option>
+                  <option value="color-burn">Color Burn</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="prop-section">
+            <div class="prop-section-title">🔘 UICorner</div>
+            <div class="prop-row"><div class="prop-field toggle-row"><label>Activer</label><input id="propCornerEnabled" type="checkbox" /></div></div>
+            <div class="prop-row"><div class="prop-field"><label>Rayon (px)</label><input id="propCornerRadius" type="number" min="0" max="200" value="8" /></div></div>
+          </div>
+
+          <div class="prop-section">
+            <div class="prop-section-title">🖊️ UIStroke</div>
+            <div class="prop-row"><div class="prop-field toggle-row"><label>Activer</label><input id="propStrokeEnabled" type="checkbox" /></div></div>
+            <div class="prop-row two">
+              <div class="prop-field"><label>Couleur</label><input id="propStrokeColor" type="color" value="#ffffff" /></div>
+              <div class="prop-field"><label>Épaisseur</label><input id="propStrokeThickness" type="number" min="1" max="20" value="2" /></div>
+            </div>
+            <div class="prop-row"><div class="prop-field">
+              <label>Transparence : <span id="propStrokeTransparencyVal">0</span></label>
+              <input id="propStrokeTransparency" type="range" min="0" max="1" step="0.01" />
+            </div></div>
+          </div>
+
+          <div class="prop-section">
+            <div class="prop-section-title">🌑 Drop Shadow</div>
+            <div class="prop-row"><div class="prop-field toggle-row"><label>Activer</label><input id="propShadowEnabled" type="checkbox" /></div></div>
+            <div class="prop-row two">
+              <div class="prop-field"><label>Couleur</label><input id="propShadowColor" type="color" value="#000000" /></div>
+              <div class="prop-field"><label>Flou (px)</label><input id="propShadowBlur" type="number" min="0" max="50" value="10" /></div>
+            </div>
+            <div class="prop-row two">
+              <div class="prop-field"><label>Offset X</label><input id="propShadowX" type="number" value="4" /></div>
+              <div class="prop-field"><label>Offset Y</label><input id="propShadowY" type="number" value="4" /></div>
+            </div>
+            <div class="prop-row"><div class="prop-field">
+              <label>Opacité : <span id="propShadowOpacityVal">0.5</span></label>
+              <input id="propShadowOpacity" type="range" min="0" max="1" step="0.01" value="0.5" />
+            </div></div>
+          </div>
+
+        </div>
+      </aside>
+    </div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="presets.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
